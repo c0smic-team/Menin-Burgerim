@@ -144,11 +144,36 @@ window.updateQty = function(index, delta) {
   renderCart();
 };
 
+// ===== ВЫБОР РАЗМЕРА ПИЦЦЫ =====
+document.querySelectorAll('.size-pill').forEach(pill => {
+  pill.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const card = this.closest('.menu-card');
+    const prices = JSON.parse(card.dataset.prices);
+    const size = this.dataset.size;
+    
+    // Переключаем активный класс
+    card.querySelectorAll('.size-pill').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    
+    // Обновляем цену в карточке
+    const priceDisplay = card.querySelector('.price');
+    priceDisplay.innerHTML = `${prices[size]} <span class="unit">сом</span>`;
+  });
+});
+
 // Добавление в корзину
 document.querySelectorAll('.btn-cart').forEach(btn => {
   btn.addEventListener('click', function () {
     const card = this.closest('.menu-card');
-    const name = card.querySelector('h3').textContent;
+    let name = card.querySelector('h3').textContent;
+    
+    // Если это пицца (есть выбор размера), добавляем размер к названию
+    const activeSize = card.querySelector('.size-pill.active');
+    if (activeSize) {
+      name += ` (${activeSize.dataset.size})`;
+    }
+
     let priceEl = card.querySelector('.price').cloneNode(true);
     // Удаляем старую (перечёркнутую) цену, если есть
     const oldPrice = priceEl.querySelector('.old');
